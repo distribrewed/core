@@ -1,0 +1,5 @@
+docker-wheel:
+	docker run --rm -it -v $(shell pwd):/build -w /build python:3-alpine ash -c "pip install .; cat /usr/local/lib/python3.5/site-packages/distribrewed_core-0.1.0-py3.5.egg-info/installed-files.txt"
+
+docker-wheel-2:
+	docker run --rm -it -v $(shell pwd):/build -w /build python:3-alpine ash

@@ -1,0 +1,17 @@
+postgres:
+  image: postgres:9
+  environment:
+    POSTGRES_DB: ${DB_NAME}
+    POSTGRES_USER: ${DB_USER}
+    POSTGRES_PASSWORD: ${DB_PASS}
+  ports:
+    - "5432:5432"
+rabbitmq:
+  image: rabbitmq:3-management
+  environment:
+    RABBITMQ_DEFAULT_USER: ${AMQP_USER}
+    RABBITMQ_DEFAULT_PASS: ${AMQP_PASS}
+    RABBITMQ_DEFAULT_VHOST: ${AMQP_VHOST}
+  ports:
+    - "5672:5672"
+    - "8100:15672"

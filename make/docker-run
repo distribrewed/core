@@ -1,0 +1,31 @@
+docker-run-master: docker-build
+	docker run -it \
+		--rm \
+		${DOCKER_STACK_RABBITMQ_LINK} \
+		-v ${ROOT_DIR}:/app \
+		-w /app/core_dev \
+		-e C_FORCE_ROOT=1 \
+		${IMAGE_TAG} \
+		celery -A core_dev worker -l info --concurrency 1
+
+docker-run-worker1: docker-build
+	docker run -it \
+		--rm \
+		${DOCKER_STACK_RABBITMQ_LINK} \
+		-v ${ROOT_DIR}:/app \
+		-w /app/core_dev \
+		-e C_FORCE_ROOT=1 \
+		-e WORKER_NAME=worker1 \
+		${IMAGE_TAG} \
+		celery -A core_dev worker -l info --concurrency 1
+
+docker-run-worker2: docker-build
+	docker run -it \
+		--rm \
+		${DOCKER_STACK_RABBITMQ_LINK} \
+		-v ${ROOT_DIR}:/app \
+		-w /app/core_dev \
+		-e C_FORCE_ROOT=1 \
+		-e WORKER_NAME=worker2 \
+		${IMAGE_TAG} \
+		celery -A core_dev worker -l info --concurrency 1
