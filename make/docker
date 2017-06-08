@@ -1,2 +1,2 @@
 docker-build:
-	docker build -t ${IMAGE_TAG} -f docker/Dockerfile .
+	docker build ${BUILD_FLAGS} -t ${IMAGE_TAG} -f docker/Dockerfile .
