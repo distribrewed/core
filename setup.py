@@ -14,8 +14,8 @@ requires = [x.strip() for x in content]
 setup(
     name='distribrewed_core',
     version='0.1.0',
-    package_dir={'distribrewed.core': './celery_demo/distribrewed/core'},
-    packages=[p.split('celery_demo.', 1)[1] for p in find_packages() if 'distribrewed.core' in p],
+    package_dir={'distribrewed.core': './core_dev/distribrewed/core'},
+    packages=[p.split('core_dev.', 1)[1] for p in find_packages() if 'distribrewed.core' in p],
     install_requires=requires,
     description=__doc__,
     include_package_data=True,
