@@ -4,7 +4,7 @@ import logging
 
 from celery import shared_task
 
-from distribrewed.core.tasks import master_plugin
+from distribrewed_core.tasks import master_plugin
 
 log = logging.getLogger(__name__)
 

@@ -32,9 +32,9 @@ def route_task(name, args, kwargs, options, task=None, **kw):
     send_to_all_workers = options.get('all_workers')
     if send_to_all_workers:
         route = all_workers_route()
-    elif name.startswith('distribrewed.core.tasks.master'):
+    elif name.startswith('distribrewed_core.tasks.master'):
         route = master_route()
-    elif name.startswith('distribrewed.core.tasks.worker'):
+    elif name.startswith('distribrewed_core.tasks.worker'):
         wid = options.get('worker_id')
         assert wid is not None, 'When calling worker tasks you should specify worker_id'
         route = worker_route(wid)

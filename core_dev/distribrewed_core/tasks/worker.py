@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from celery import shared_task
 
-from distribrewed.core.tasks import worker_plugin
+from distribrewed_core.tasks import worker_plugin
 
 
 # Ping / Pong

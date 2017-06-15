@@ -5,7 +5,7 @@ from celery import Celery
 from kombu import Exchange
 from kombu.common import Broadcast
 
-from distribrewed.core.routes import master_route, worker_route, all_workers_route, route_task
+from distribrewed_core.routes import master_route, worker_route, all_workers_route, route_task
 
 log = logging.getLogger(__name__)
 
@@ -72,6 +72,6 @@ else:
 queue.conf.task_routes = (route_task,)
 
 # noinspection PyUnresolvedReferences
-from distribrewed.core.tasks.master import *
+from distribrewed_core.tasks.master import *
 # noinspection PyUnresolvedReferences
-from distribrewed.core.tasks.worker import *
+from distribrewed_core.tasks.worker import *

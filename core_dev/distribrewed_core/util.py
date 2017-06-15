@@ -1,6 +1,6 @@
 import logging
 
-from distribrewed.core.celery import queue
+from distribrewed_core.celery import queue
 
 log = logging.getLogger(__name__)
 

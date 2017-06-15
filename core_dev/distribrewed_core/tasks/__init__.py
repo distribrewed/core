@@ -1,6 +1,6 @@
 import os
 
-from distribrewed.core.base import load_plugins
+from distribrewed_core.base import load_plugins
 
 master_plugin = None
 if master_plugin is None:

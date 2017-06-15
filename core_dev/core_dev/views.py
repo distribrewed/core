@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
 from core_dev.celery import queue
-from distribrewed.core.util import run_task_by_name
+from distribrewed_core.util import run_task_by_name
 
 log = logging.getLogger(__name__)
 
