@@ -5,6 +5,7 @@ docker-run-master: docker-build
 		-v ${ROOT_DIR}:/app \
 		-w /app/core_dev \
 		-e C_FORCE_ROOT=1 \
+		-e MASTER_PLUGIN_CLASS=BaseMaster \
 		${IMAGE_TAG} \
 		celery -A core_dev worker -l info --concurrency 1
 
@@ -16,6 +17,7 @@ docker-run-worker1: docker-build
 		-w /app/core_dev \
 		-e C_FORCE_ROOT=1 \
 		-e WORKER_NAME=worker1 \
+		-e WORKER_PLUGIN_CLASS=BaseWorker \
 		${IMAGE_TAG} \
 		celery -A core_dev worker -l info --concurrency 1
 
@@ -27,5 +29,6 @@ docker-run-worker2: docker-build
 		-w /app/core_dev \
 		-e C_FORCE_ROOT=1 \
 		-e WORKER_NAME=worker2 \
+		-e WORKER_PLUGIN_CLASS=BaseWorker \
 		${IMAGE_TAG} \
 		celery -A core_dev worker -l info --concurrency 1

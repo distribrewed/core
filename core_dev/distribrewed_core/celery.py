@@ -35,8 +35,7 @@ if os.environ.get('CELERY_ALWAYS_EAGER', 'false').lower() in ['1', 'true']:
 queue.conf.task_default_delivery_mode = 'transient'  # Broker only keeps messages in memory
 routes = []
 
-worker_id = os.environ.get('WORKER_NAME', None)
-if worker_id is None:
+if os.environ.get('MASTER_PLUGIN_CLASS', None) is not None:
     # Assume this is master
     all_w_route = all_workers_route()
     m_route = master_route()
@@ -51,6 +50,7 @@ if worker_id is None:
     )
 else:
     # Assume this is a worker
+    worker_id = os.environ.get('WORKER_NAME', os.environ.get('HOSTNAME', None))
     w_route = worker_route(worker_id)
     all_w_route = all_workers_route()
     queue.conf.task_queues = (
