@@ -12,7 +12,10 @@ def load_plugins(plugin_type, plugin_dir, plugin_classes):
         for p in plugin_classes:
             print("Loading plugin class '{0}'".format(p), flush=True)
             if p not in class_names:
-                print("Plugin class {0} not found! skipping...".format(p))
+                print("Plugin class {0} not found! skipping...".format(p), flush=True)
             else:
                 loaded_plugins.append(found_classes[class_names.index(p)]())
-    return loaded_plugins
+    if len(loaded_plugins) != 1:
+        print("No plugin found, exiting!", flush=True)
+        exit(-1)
+    return loaded_plugins[0]
