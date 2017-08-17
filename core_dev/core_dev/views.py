@@ -64,6 +64,7 @@ class TaskRunView(GenericAPIView):
         arg = ()
         for key in request.QUERY_PARAMS:
             arg += (key,)
+        arg = arg[::-1]
         task = run_task_by_name(id, *arg)
         return Response(
             self.get_serializer(CeleryTaskObj(*task), many=False).data)
