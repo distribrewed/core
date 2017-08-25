@@ -48,7 +48,7 @@ if os.environ.get('MASTER_PLUGIN_CLASS', None) is not None:
             routing_key=m_route['routing_key']
         ),
     )
-else:
+elif os.environ.get('WORKER_PLUGIN_CLASS', None):
     # Assume this is a worker
     worker_id = os.environ.get('WORKER_NAME', os.environ.get('HOSTNAME', None))
     w_route = worker_route(worker_id)
@@ -69,6 +69,10 @@ else:
             routing_key=all_w_route['routing_key']
         ),
     )
+else:
+    print('No PLUGIN_CLASS provided! Exiting!')
+    exit(1)
+
 queue.conf.task_routes = (route_task,)
 
 # noinspection PyUnresolvedReferences
