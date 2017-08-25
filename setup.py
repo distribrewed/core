@@ -6,7 +6,7 @@ from distutils.core import setup
 
 from setuptools import find_packages
 
-with open('requirements-core.txt') as f:
+with open('requirements.txt') as f:
     content = f.readlines()
 
 requires = [x.strip() for x in content]

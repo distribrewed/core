@@ -1,12 +1,12 @@
-django-manage: docker-build
+django-dev-manage: docker-dev-build
 	docker run -it \
 		--rm \
 		-v ${ROOT_DIR}:/tmp \
 		-w /tmp/core_dev \
-		${IMAGE_TAG} \
+		${DOCKER_DEV_IMAGE_TAG_DEV} \
 		python manage.py ${ARG}
 
-django-chown:
+django-dev-chown:
 	@set -xe ;\
 	test $${USER} != "" ;\
 	sudo chown $${USER}:$${USER} ${ROOT_DIR} -R

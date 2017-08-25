@@ -1,5 +1,2 @@
-# For simple task API
-djangorestframework==3.1.3
-Django>=1.8.2,<1.9
-psycopg2
--r requirements-core.txt
+Celery>4
+pike

@@ -1,0 +1,22 @@
+docker-dev-stack-up:
+	test ${DOCKER_DEV_STACK_DIR} != ""
+	cd ${DOCKER_DEV_STACK_DIR} ;\
+	docker-compose up -d
+	cd ${ROOT_DIR}
+	@$(MAKE) docker-dev-stack-migrate
+
+docker-dev-stack-down:
+	test ${DOCKER_DEV_STACK_DIR} != ""
+	cd ${DOCKER_DEV_STACK_DIR} ;\
+	docker-compose down
+
+docker-dev-stack-migrate: docker-dev-build
+	@sleep ${DOCKER_DEV_STACK_TIME_DELAY}
+	docker run -it \
+		--rm \
+		${DOCKER_DEV_STACK_DB_LINK} \
+		--env-file=${DOCKER_DEV_STACK_ENV_FILE} \
+		-v ${ROOT_DIR}:/tmp \
+		-w /tmp \
+		${DOCKER_DEV_IMAGE_TAG_DEV} \
+		python core_dev/manage.py migrate

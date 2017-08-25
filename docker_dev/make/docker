@@ -1,0 +1,2 @@
+docker-dev-build:
+	docker build ${BUILD_FLAGS} -t ${DOCKER_DEV_IMAGE_TAG_DEV} -f ${DOCKER_DEV_FILE} .

@@ -1,14 +1,16 @@
 ROOT_DIR := $(shell pwd)
-IMAGE_TAG := distribrewed/core_dev
 
-DOCKER_STACK_DB_CONTAINER_NAME ?= coredev_postgres_1
-DOCKER_STACK_DB_LINK ?= --link=${DOCKER_STACK_DB_CONTAINER_NAME}:postgres
+DOCKER_DEV_IMAGE_TAG_DEV := distribrewed/core_dev
+DOCKER_DEV_FILE := ${ROOT_DIR}/docker_dev/Dockerfile
 
-DOCKER_STACK_RABBITMQ_CONTAINER_NAME ?= coredev_rabbitmq_1
-DOCKER_STACK_RABBITMQ_LINK ?= --link=${DOCKER_STACK_RABBITMQ_CONTAINER_NAME}:rabbitmq
+DOCKER_DEV_STACK_DB_CONTAINER_NAME ?= coredev_postgres_1
+DOCKER_DEV_STACK_DB_LINK ?= --link=${DOCKER_DEV_STACK_DB_CONTAINER_NAME}:postgres
 
-DOCKER_STACK_TIME_DELAY := 5
-DOCKER_STACK_DIR := ${ROOT_DIR}/docker_stack/core_dev
-DOCKER_STACK_ENV_FILE ?= ${DOCKER_STACK_DIR}/.env
+DOCKER_DEV_STACK_RABBITMQ_CONTAINER_NAME ?= coredev_rabbitmq_1
+DOCKER_DEV_STACK_RABBITMQ_LINK ?= --link=${DOCKER_DEV_STACK_RABBITMQ_CONTAINER_NAME}:rabbitmq
 
-include make/*
+DOCKER_DEV_STACK_TIME_DELAY := 5
+DOCKER_DEV_STACK_DIR := ${ROOT_DIR}/docker_dev/docker_stack/core_dev
+DOCKER_DEV_STACK_ENV_FILE ?= ${DOCKER_DEV_STACK_DIR}/.env
+
+include docker_dev/make/*

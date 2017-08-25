@@ -1,34 +1,34 @@
-docker-run-master: docker-build
+docker-dev-run-master: docker-dev-build
 	docker run -it \
 		--rm \
-		${DOCKER_STACK_RABBITMQ_LINK} \
+		${DOCKER_DEV_STACK_RABBITMQ_LINK} \
 		-v ${ROOT_DIR}:/app \
 		-w /app/core_dev \
 		-e C_FORCE_ROOT=1 \
 		-e MASTER_PLUGIN_CLASS=BaseMaster \
-		${IMAGE_TAG} \
+		${DOCKER_DEV_IMAGE_TAG_DEV} \
 		celery -A core_dev worker -l info --concurrency 1
 
-docker-run-worker1: docker-build
+docker-dev-run-worker1: docker-dev-build
 	docker run -it \
 		--rm \
-		${DOCKER_STACK_RABBITMQ_LINK} \
+		${DOCKER_DEV_STACK_RABBITMQ_LINK} \
 		-v ${ROOT_DIR}:/app \
 		-w /app/core_dev \
 		-e C_FORCE_ROOT=1 \
 		-e WORKER_NAME=worker1 \
 		-e WORKER_PLUGIN_CLASS=BaseWorker \
-		${IMAGE_TAG} \
+		${DOCKER_DEV_IMAGE_TAG_DEV} \
 		celery -A core_dev worker -l info --concurrency 1
 
-docker-run-worker2: docker-build
+docker-dev-run-worker2: docker-dev-build
 	docker run -it \
 		--rm \
-		${DOCKER_STACK_RABBITMQ_LINK} \
+		${DOCKER_DEV_STACK_RABBITMQ_LINK} \
 		-v ${ROOT_DIR}:/app \
 		-w /app/core_dev \
 		-e C_FORCE_ROOT=1 \
 		-e WORKER_NAME=worker2 \
 		-e WORKER_PLUGIN_CLASS=BaseWorker \
-		${IMAGE_TAG} \
+		${DOCKER_DEV_IMAGE_TAG_DEV} \
 		celery -A core_dev worker -l info --concurrency 1
