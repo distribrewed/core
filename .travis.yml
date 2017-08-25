@@ -1,0 +1,25 @@
+sudo: required
+services:
+  - docker
+language: bash
+
+jobs:
+  include:
+    - stage: Build x64 image
+      script:
+      - docker build -t distribrewed/core:x64 -f Dockerfile .
+      - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+      - docker push distribrewed/core:x64
+    - stage: Build ARM image
+      script:
+      - sed 's/\/base:x64/\/base:arm/g' Dockerfile > Dockerfile.arm
+      - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+      - docker build -t distribrewed/core:arm -f Dockerfile.arm .
+      - docker run -t distribrewed/core:arm python --version
+      - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+      - docker push distribrewed/core:arm
+    - stage: Test docker pull
+      script:
+      - docker run -t distribrewed/core:x64 python --version
+      - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+      - docker run -t distribrewed/core:arm python --version
