@@ -1,0 +1,75 @@
+postgres:
+  image: postgres:9
+  environment:
+    POSTGRES_DB: distribrewed
+    POSTGRES_USER: distribrewed
+    POSTGRES_PASSWORD: secretpass
+  ports:
+    - "5432:5432"
+rabbitmq:
+  image: rabbitmq:3-management
+  environment:
+    RABBITMQ_DEFAULT_USER: distribrewed
+    RABBITMQ_DEFAULT_PASS: secretpass
+    RABBITMQ_DEFAULT_VHOST: celery.distribrewed
+  ports:
+    - "5672:5672"
+    - "8100:15672" # RABBITMQ UI
+
+# Distribrewed
+master:
+  image: distribrewed/master:x64
+  links:
+    - rabbitmq
+    - postgres
+  environment:
+    DJANGO_SETTINGS_MODULE: distribrewed.settings
+    DB_HOST: postgres
+    DB_PORT: 5432
+    DB_NAME: distribrewed
+    DB_USER: distribrewed
+    DB_PASS: secretpass
+    AMQP_HOST: rabbitmq
+    AMQP_PORT: 5672
+    AMQP_USER: distribrewed
+    AMQP_PASS: secretpass
+    AMQP_VHOST: celery.distribrewed
+api:
+  image: distribrewed/master:x64
+  links:
+    - rabbitmq
+    - postgres
+  environment:
+    DJANGO_SETTINGS_MODULE: distribrewed.settings
+    DB_HOST: postgres
+    DB_PORT: 5432
+    DB_NAME: distribrewed
+    DB_USER: distribrewed
+    DB_PASS: secretpass
+    AMQP_HOST: rabbitmq
+    AMQP_PORT: 5672
+    AMQP_USER: distribrewed
+    AMQP_PASS: secretpass
+    AMQP_VHOST: celery.distribrewed
+  command:
+    - python
+    - -u
+    - manage.py
+    - runserver
+    - 0.0.0.0:8000
+  ports:
+    - "8000:8000" # API
+telegram_worker:
+  image: distribrewed/workers:x64
+  links:
+    - rabbitmq
+  environment:
+    AMQP_HOST: rabbitmq
+    AMQP_PORT: 5672
+    AMQP_USER: distribrewed
+    AMQP_PASS: secretpass
+    AMQP_VHOST: celery.distribrewed
+    WORKER_PLUGIN_CLASS: TelegramWorker
+    WORKER_NAME: telegram
+    TELEGRAM_TOKEN: 403272594:AAGXWz1ZNXOlbNIcuYCM4BVgdJu2afM02uw
+    TELEGRAM_CHAT: -246226477
