@@ -1,2 +1,4 @@
 Celery>4
 pike
+
+prometheus_client
