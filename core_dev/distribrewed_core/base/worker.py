@@ -65,18 +65,15 @@ class BaseWorker(CeleryWorker):
             parameterList
         ])
 
-    def info(self):
-        return 'name:{0}, type:{1}'.format(self.name, str(self.__class__.__name__))
-
-    def start(self, shcedule):
+    def start_worker(self, shcedule):
         pass
 
-    def stop(self):
+    def stop_worker(self):
         pass
 
-    def pause(self):
+    def pause_worker(self):
         pass
 
-    def resume(self):
+    def resume_worker(self):
         pass
 
