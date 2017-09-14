@@ -3,6 +3,10 @@ services:
   - docker
 language: bash
 
+branches:
+  only:
+    - master
+
 jobs:
   include:
     - stage: Build x64 image
