@@ -64,3 +64,19 @@ class BaseWorker(CeleryWorker):
             method_name,
             parameterList
         ])
+
+    def info(self):
+        return 'name:{0}, type:{1}'.format(self.name, str(self.__class__.__name__))
+
+    def start(self, shcedule):
+        pass
+
+    def stop(self):
+        pass
+
+    def pause(self):
+        pass
+
+    def resume(self):
+        pass
+
