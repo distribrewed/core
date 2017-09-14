@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
+    s.connect((os.environ.get('AMQP_HOST', 'rabbitmq'), int(os.environ.get('AMQP_PORT', '5672'))))
     ip = s.getsockname()[0]
     s.close()
     return ip
