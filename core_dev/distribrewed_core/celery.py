@@ -110,20 +110,21 @@ def on_ready(*args, **kwargs):
     w = get_worker_plugin()
     if m:
         tasks.master.call_method_by_name.apply_async(
-            args=['on_ready']
+            args=['_on_ready']
         )
     if w:
         tasks.worker.call_method_by_name.apply_async(
             worker_id=w.name,
-            args=['on_ready']
+            args=['_on_ready']
         )
 
 
+# noinspection PyProtectedMember
 @signals.worker_process_shutdown.connect
 def on_shutdown(*args, **kwargs):
     m = get_master_plugin()
     w = get_worker_plugin()
     if m:
-        m.on_shutdown()
+        m._on_shutdown()
     if w:
-        w.on_shutdown()
+        w._on_shutdown()

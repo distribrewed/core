@@ -13,25 +13,27 @@ docker-dev-run-master: docker-dev-build
 docker-dev-run-worker1: docker-dev-build
 	docker run -it \
 		--rm \
-		${DOCKER_DEV_STACK_RABBITMQ_LINK} \
 		-v ${ROOT_DIR}:/app \
 		-w /app/core_dev \
+		--net=host \
 		-e C_FORCE_ROOT=1 \
+		-e AMQP_HOST=localhost \
 		-e WORKER_NAME=worker1 \
 		-e WORKER_PLUGIN_CLASS=BaseWorker \
-		-p 9001:9000 \
+		-e PROMETHEUS_SCRAPE_PORT=9001 \
 		${DOCKER_DEV_IMAGE_TAG_DEV} \
 		celery -A core_dev worker -l info --concurrency 1
 
 docker-dev-run-worker2: docker-dev-build
 	docker run -it \
 		--rm \
-		${DOCKER_DEV_STACK_RABBITMQ_LINK} \
 		-v ${ROOT_DIR}:/app \
 		-w /app/core_dev \
+		--net=host \
 		-e C_FORCE_ROOT=1 \
+		-e AMQP_HOST=localhost \
 		-e WORKER_NAME=worker2 \
 		-e WORKER_PLUGIN_CLASS=BaseWorker \
-		-p 9002:9000 \
+		-e PROMETHEUS_SCRAPE_PORT=9002 \
 		${DOCKER_DEV_IMAGE_TAG_DEV} \
 		celery -A core_dev worker -l info --concurrency 1
