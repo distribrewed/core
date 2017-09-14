@@ -8,7 +8,11 @@ log = logging.getLogger(__name__)
 
 
 def get_ip():
-    return socket.gethostbyname(socket.gethostname())
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    ip = s.getsockname()[0]
+    s.close()
+    return ip
 
 
 class CeleryWorker:
@@ -16,7 +20,7 @@ class CeleryWorker:
     ip = None
 
     # noinspection PyMethodMayBeStatic
-    def on_ready(self):
+    def _on_ready(self):
         try:
             self.prom_port = int(os.environ.get('PROMETHEUS_SCRAPE_PORT', '9000'))
             log.info('Starting prometheus scrape port on {0}'.format(self.prom_port))
@@ -28,5 +32,5 @@ class CeleryWorker:
         if self.ip.startswith('172'):
             log.warning('Container not running in HOST mode, not a public IP address')
 
-    def on_shutdown(self):
+    def _on_shutdown(self):
         pass
