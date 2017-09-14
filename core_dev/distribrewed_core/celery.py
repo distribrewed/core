@@ -1,10 +1,11 @@
 import logging
 import os
 
-from celery import Celery
+from celery import Celery, signals
 from kombu import Exchange
 from kombu.common import Broadcast
 
+from distribrewed_core import tasks
 from distribrewed_core.routes import master_route, worker_route, all_workers_route, route_task
 
 log = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ queue.conf.timezone = 'Atlantic/Reykjavik'
 
 queue.conf.worker_hijack_root_logger = False
 
-if os.environ.get('CELERY_LOGGING', 'false').lower() not in ['1', 'true']:
+if os.environ.get('CELERY_LOGGING', 'true').lower() not in ['1', 'true']:
     logging.getLogger('celery').propagate = False
 
 if os.environ.get('CELERY_ALWAYS_EAGER', 'false').lower() in ['1', 'true']:
@@ -79,3 +80,50 @@ queue.conf.task_routes = (route_task,)
 from distribrewed_core.tasks.master import *
 # noinspection PyUnresolvedReferences
 from distribrewed_core.tasks.worker import *
+
+
+@signals.setup_logging.connect
+def setup_logging(*args, **kwargs):
+    # If debug
+    if 1 == 0:
+        logging.basicConfig(level=logging.DEBUG, format='%(pathname)s:%(lineno)s: [%(levelname)s] %(message)s')
+    else:
+        # Standard logging
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)-35s %(levelname)-7s %(message)s')
+        logging.getLogger('celery').setLevel(logging.WARNING)
+
+
+@signals.worker_ready.connect
+def load_all_plugins(*args, **kwargs):
+    log.info('Loading plugins...')
+    m = get_master_plugin()
+    w = get_worker_plugin()
+    if m:
+        log.info('Master plugin: {0}'.format(m.__class__.__name__))
+    if w:
+        log.info('Worker plugin: {0}'.format(w.__class__.__name__))
+
+
+@signals.worker_ready.connect
+def on_ready(*args, **kwargs):
+    m = get_master_plugin()
+    w = get_worker_plugin()
+    if m:
+        tasks.master.call_method_by_name.apply_async(
+            args=['on_ready']
+        )
+    if w:
+        tasks.worker.call_method_by_name.apply_async(
+            worker_id=w.name,
+            args=['on_ready']
+        )
+
+
+@signals.worker_process_shutdown.connect
+def on_shutdown(*args, **kwargs):
+    m = get_master_plugin()
+    w = get_worker_plugin()
+    if m:
+        m.on_shutdown()
+    if w:
+        w.on_shutdown()

@@ -1,14 +1,24 @@
+import json
 import logging
 
+import kombu
+from prometheus_client import Counter
+
 from distribrewed_core import tasks
+from distribrewed_core.base.celery import CeleryWorker
 
 log = logging.getLogger(__name__)
 
+CALLS_TO_WORKERS = Counter('CALLS_TO_WORKERS', 'Number of calls to workers', ['worker'])
+
 
 # noinspection PyMethodMayBeStatic
-class BaseMaster:
+class BaseMaster(CeleryWorker):
     def __init__(self):
         pass
+
+    def on_ready(self):
+        super(BaseMaster, self).on_ready()
 
     def call_worker_method(self, worker_id=None, all_workers=False, method='NONAME', args=[]):
         tasks.worker.call_method_by_name.apply_async(
@@ -16,6 +26,17 @@ class BaseMaster:
             all_workers=all_workers,
             args=[method] + args
         )
+        if all_workers:
+            CALLS_TO_WORKERS.labels('all').inc()
+        if worker_id:
+            CALLS_TO_WORKERS.labels(worker_id).inc()
+
+    def register_worker(self, worker_id, worker_info):
+        log.info("Registering '{0}': {1}".format(worker_id, json.dumps(worker_info, sort_keys=True)))
+        kombu.pools.reset()  # TODO: Maybe a little drastic
+
+    def de_register_worker(self, worker_id, worker_info):
+        log.info("De-registering '{0}': {1}".format(worker_id, json.dumps(worker_info, sort_keys=True)))
 
     def ping_worker(self, worker_id):
         log.info("Sending ping to '{0}'".format(worker_id))

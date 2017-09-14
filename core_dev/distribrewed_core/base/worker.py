@@ -2,18 +2,42 @@ import inspect
 import logging
 import os
 
+from prometheus_client import Counter
+
 from distribrewed_core import tasks
+from distribrewed_core.base.celery import CeleryWorker
 
 log = logging.getLogger(__name__)
 
+CALLS_TO_MASTER = Counter('CALLS_TO_MASTER', 'Number of calls to master')
+
 
 # noinspection PyMethodMayBeStatic
-class BaseWorker:
+class BaseWorker(CeleryWorker):
     def __init__(self):
         self.name = os.environ.get('WORKER_NAME', os.environ.get('HOSTNAME', None))
 
+    def worker_info(self):
+        return {
+            'id': self.name,
+            'ip': self.ip,
+            'type': self.__class__.__name__,
+            'prometheus_scrape_port': self.prom_port
+        }
+
+    def on_ready(self):
+        super(BaseWorker, self).on_ready()
+        log.info('Sending registration to master')
+        self.call_master_method('register_worker', args=[self.name, self.worker_info()])
+
+    def on_shutdown(self):
+        super(BaseWorker, self).on_shutdown()
+        log.info('Sending de-registration to master')
+        self.call_master_method('de_register_worker', args=[self.name, self.worker_info()])
+
     def call_master_method(self, method='NONAME', args=[]):
         tasks.master.call_method_by_name.apply_async(args=[method] + args)
+        CALLS_TO_MASTER.inc()
 
     def ping_master(self):
         log.info('Sending ping to master')
