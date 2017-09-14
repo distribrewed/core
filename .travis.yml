@@ -22,8 +22,8 @@ jobs:
       - docker run -t distribrewed/core:arm python --version
       - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
       - docker push distribrewed/core:arm
-    - stage: Test docker pull
-      script:
-      - docker run -t distribrewed/core:x64 python --version
-      - docker run --rm --privileged multiarch/qemu-user-static:register --reset
-      - docker run -t distribrewed/core:arm python --version
+#    - stage: Test docker pull
+#      script:
+#      - docker run -t distribrewed/core:x64 python --version
+#      - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+#      - docker run -t distribrewed/core:arm python --version
