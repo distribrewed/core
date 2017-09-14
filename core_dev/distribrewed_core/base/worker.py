@@ -39,17 +39,23 @@ class BaseWorker(CeleryWorker):
 
     def _on_ready(self):
         super(BaseWorker, self)._on_ready()
-        log.info('Sending registration to master')
-        self._call_master_method('register_worker', args=[self.name, self._worker_info(), self._worker_methods()])
+        self.register()
 
     def _on_shutdown(self):
         super(BaseWorker, self)._on_shutdown()
-        log.info('Sending de-registration to master')
-        self._call_master_method('de_register_worker', args=[self.name, self._worker_info()])
+        self.de_register()
 
     def _call_master_method(self, method='NONAME', args=[]):
         tasks.master.call_method_by_name.apply_async(args=[method] + args)
         CALLS_TO_MASTER.inc()
+
+    def register(self):
+        log.info('Sending registration to master')
+        self._call_master_method('register_worker', args=[self.name, self._worker_info(), self._worker_methods()])
+
+    def de_register(self):
+        log.info('Sending de-registration to master')
+        self._call_master_method('de_register_worker', args=[self.name, self._worker_info()])
 
     def ping_master(self):
         log.info('Sending ping to master')
