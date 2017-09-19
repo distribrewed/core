@@ -80,3 +80,16 @@ class BaseWorker(CeleryWorker):
             method_name,
             self._worker_methods()[method_name]
         ])
+
+    def start_worker(self, shcedule):
+        pass
+
+    def stop_worker(self):
+        pass
+
+    def pause_worker(self):
+        pass
+
+    def resume_worker(self):
+        pass
+

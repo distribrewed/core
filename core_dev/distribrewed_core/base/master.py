@@ -82,3 +82,19 @@ class BaseMaster(CeleryWorker):
 
     def receive_worker_method_parameter_list(self, worker_id, method_name, parameter_names):
         log.info("{0} method {1} parameters: {2}".format(worker_id, method_name, parameter_names))
+
+    def request_worker_start(self, worker_id, schedule):
+        log.info("Requesting worker start {0}".format(worker_id))
+        self.call_worker_method(worker_id=worker_id, method='start_worker', args=[schedule])
+
+    def request_worker_stop(self, worker_id):
+        log.info("Requesting worker stop {0}".format(worker_id))
+        self.call_worker_method(worker_id=worker_id, method='stop_worker')
+
+    def request_worker_pause(self, worker_id):
+        log.info("Requesting worker pause {0}".format(worker_id))
+        self.call_worker_method(worker_id=worker_id, method='pause_worker')
+
+    def request_worker_resume(self, worker_id):
+        log.info("Requesting worker pause {0}".format(worker_id))
+        self.call_worker_method(worker_id=worker_id, method='resume_worker')
