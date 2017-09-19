@@ -27,3 +27,6 @@ jobs:
 #      - docker run -t distribrewed/core:x64 python --version
 #      - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 #      - docker run -t distribrewed/core:arm python --version
+
+after_success:
+- ./trigger_builds.sh
