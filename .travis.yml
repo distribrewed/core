@@ -18,5 +18,10 @@ jobs:
       script:
       - ./travis_scripts/build_$ARCH.sh
     - stage: Trigger builds
+      env: REPO=distribrewed/master
+      script:
+      - ./travis_scripts/trigger_builds.sh
+    - stage: Trigger builds
+      env: REPO=distribrewed/workers
       script:
       - ./travis_scripts/trigger_builds.sh
