@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 echo -n "Rebuild $REPO "
 URL=$(echo $REPO | sed 's/\//%2F/g')
 curl -X POST \
