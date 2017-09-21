@@ -1,6 +1,8 @@
 # Distribrewed core
-[![Build Status](https://travis-ci.org/distribrewed/core.svg?branch=master)](https://travis-ci.org/distribrewed/core/)
-[![This image on DockerHub](https://img.shields.io/docker/pulls/distribrewed/core.svg)](https://hub.docker.com/r/distribrewed/core/)
+[![Dependency Status](https://www.versioneye.com/user/projects/59c3ef68368b0832142089d2/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/59c3ef68368b0832142089d2)
+[![Build Status](https://img.shields.io/travis/distribrewed/core.svg?branch=master&style=flat-square)](https://travis-ci.org/distribrewed/core/)
+[![Codecov](https://img.shields.io/codecov/c/github/distribrewed/core.svg?style=flat-square)]()
+[![Image pulls](https://img.shields.io/docker/pulls/distribrewed/core.svg?style=flat-square)](https://hub.docker.com/r/distribrewed/core/)
 
 This repo contains the core communications between master and workers.
 
