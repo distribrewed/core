@@ -2,4 +2,5 @@
 djangorestframework==3.1.3
 Django>=1.8.2,<1.9
 psycopg2
+coverage
 -r requirements.txt

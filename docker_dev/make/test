@@ -1,0 +1,2 @@
+docker-dev-test-coverage:
+	./travis_scripts/test.sh
