@@ -1,15 +1,16 @@
 import logging
-import os
 import socket
 
 from prometheus_client import start_http_server
+
+from distribrewed_core import settings
 
 log = logging.getLogger(__name__)
 
 
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect((os.environ.get('AMQP_HOST', 'rabbitmq'), int(os.environ.get('AMQP_PORT', '5672'))))
+    s.connect((settings.AMQP_HOST, settings.AMQP_PORT))
     ip = s.getsockname()[0]
     s.close()
     return ip
@@ -22,7 +23,7 @@ class CeleryWorker:
     # noinspection PyMethodMayBeStatic
     def _on_ready(self):
         try:
-            self.prom_port = int(os.environ.get('PROMETHEUS_SCRAPE_PORT', '9000'))
+            self.prom_port = settings.PROMETHEUS_SCRAPE_PORT
             log.info('Starting prometheus scrape port on {0}'.format(self.prom_port))
             start_http_server(self.prom_port)
         except Exception as e:

@@ -3,38 +3,33 @@ import os
 
 from pike.manager import PikeManager
 
+from distribrewed_core import settings
+
 log = logging.getLogger(__name__)
 
-_plugin_dir = os.environ.get(
-    'PLUGIN_DIR',
-    os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'base'))
-)
 
 _master_plugin = None
-_master_plugin_class = os.environ.get('MASTER_PLUGIN_CLASS', None)
-
 _worker_plugin = None
-_worker_plugin_class = os.environ.get('WORKER_PLUGIN_CLASS', None)
 
 
 def get_master_plugin():
     global _master_plugin
-    if _master_plugin is None and _master_plugin_class is not None:
+    if _master_plugin is None and settings.MASTER_PLUGIN_CLASS is not None:
         _master_plugin = load_plugin_class(
             'master',
-            _plugin_dir,
-            _master_plugin_class
+            settings.PLUGIN_DIR,
+            settings.MASTER_PLUGIN_CLASS
         )
     return _master_plugin
 
 
 def get_worker_plugin():
     global _worker_plugin
-    if _worker_plugin is None and _worker_plugin_class is not None:
+    if _worker_plugin is None and settings.WORKER_PLUGIN_CLASS is not None:
         _worker_plugin = load_plugin_class(
             'worker',
-            _plugin_dir,
-            _worker_plugin_class
+            settings.PLUGIN_DIR,
+            settings.WORKER_PLUGIN_CLASS
         )
     return _worker_plugin
 

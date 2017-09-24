@@ -1,11 +1,10 @@
 import inspect
 import logging
-import os
 from collections import OrderedDict
 
 from prometheus_client import Counter
 
-from distribrewed_core import tasks
+from distribrewed_core import tasks, settings
 from distribrewed_core.base.celery import CeleryWorker
 
 log = logging.getLogger(__name__)
@@ -16,7 +15,7 @@ CALLS_TO_MASTER = Counter('CALLS_TO_MASTER', 'Number of calls to master')
 # noinspection PyMethodMayBeStatic
 class BaseWorker(CeleryWorker):
     def __init__(self):
-        self.name = os.environ.get('WORKER_NAME', os.environ.get('HOSTNAME', None))
+        self.name = settings.WORKER_NAME
 
     def _worker_info(self):
         return {
@@ -92,4 +91,3 @@ class BaseWorker(CeleryWorker):
 
     def resume_worker(self):
         pass
-
