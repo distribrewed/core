@@ -26,13 +26,11 @@ class TestRun(TestCase):
         settings.AMQP_PORT = 0
         settings.PROMETHEUS_SCRAPE_PORT = 9123
 
-        def prom_server_fail(port):
-            raise Exception('Test prometheus server fail on port {}'.format(port))
-
-        mock_prom_server = prom_server_fail
-
+        mock_prom_server.side_effect = Exception('Test prometheus server fail on')
         worker = CeleryWorker()
         worker._on_ready()
+
+        mock_prom_server.assert_called_with(settings.PROMETHEUS_SCRAPE_PORT)
 
     def test_on_shutdown(self):
         worker = CeleryWorker()
