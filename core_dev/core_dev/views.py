@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
 from core_dev.celery import queue
-from distribrewed_core.util import run_task_by_name
+from core_dev.util import run_task_by_name
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class CeleryTaskSerializer(serializers.Serializer):
 class TaskListView(GenericAPIView):
     def get(self, request, format=None):
         return Response(OrderedDict([
-            ('availableTasks', [reverse('task-run', request=request, args=[t], format=format)for t in tasks])
+            ('availableTasks', [reverse('task-run', request=request, args=[t], format=format) for t in tasks])
         ]), status=status.HTTP_200_OK)
 
 

@@ -1,5 +1,4 @@
 import logging
-import os
 
 from pike.manager import PikeManager
 
@@ -7,9 +6,16 @@ from distribrewed_core import settings
 
 log = logging.getLogger(__name__)
 
-
 _master_plugin = None
 _worker_plugin = None
+
+
+def clear_plugins():
+    """ For testing """
+    global _master_plugin
+    global _worker_plugin
+    _master_plugin = None
+    _worker_plugin = None
 
 
 def get_master_plugin():
@@ -51,4 +57,4 @@ def load_plugin_class(plugin_type, plugin_dir, plugin_classes):
     if len(loaded_plugins) != 1:
         log.error("No plugin found, exiting!")
         exit(-1)
-    return loaded_plugins[0]
+    return loaded_plugins[0] if len(loaded_plugins) == 1 else None

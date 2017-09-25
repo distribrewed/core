@@ -4,7 +4,7 @@ from unittest.mock import patch
 from distribrewed_core.base.celery import CeleryWorker
 
 
-class TestRun(TestCase):
+class Tests(TestCase):
     @patch('distribrewed_core.base.celery.start_http_server')
     @patch('distribrewed_core.base.celery.settings')
     def test_on_ready(self, settings, mock_prom_server):
