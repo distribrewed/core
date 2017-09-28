@@ -31,6 +31,11 @@ class BaseMaster(CeleryWorker):
         if worker_id:
             CALLS_TO_WORKERS.labels(worker_id).inc()
 
+    # Registration methods
+
+    def reload_queues(self):
+        kombu.pools.reset()  # TODO: Maybe a little drastic / find a better way
+
     def register_worker(self, worker_id, worker_info, worker_methods, reload_queues=False):
         log.info("Registering '{0}' ; Info : {1} ; Methods : {2}".format(
             worker_id,
@@ -40,11 +45,18 @@ class BaseMaster(CeleryWorker):
         if reload_queues:
             self.reload_queues()
 
-    def reload_queues(self):
-        kombu.pools.reset()  # TODO: Maybe a little drastic / find a better way
-
     def de_register_worker(self, worker_id, worker_info):
         log.info("De-registering '{0}': {1}".format(worker_id, json.dumps(worker_info, sort_keys=True)))
+
+    def command_all_workers_to_register(self):
+        log.info("Commanding all workers to re-register")
+        self._call_worker_method(all_workers=True, method='register')
+
+    def command_all_workers_to_de_register(self):
+        log.info("Commanding all workers to re-register")
+        self._call_worker_method(all_workers=True, method='de_register')
+
+    # Ping methods
 
     def ping_worker(self, worker_id):
         log.info("Sending ping to '{0}'".format(worker_id))
@@ -64,14 +76,6 @@ class BaseMaster(CeleryWorker):
     def command_all_workers_to_ping_master(self):
         log.info("Commanding all workers to ping master")
         self._call_worker_method(all_workers=True, method='ping_master')
-
-    def command_all_workers_to_register(self):
-        log.info("Commanding all workers to re-register")
-        self._call_worker_method(all_workers=True, method='register')
-
-    def command_all_workers_to_de_register(self):
-        log.info("Commanding all workers to re-register")
-        self._call_worker_method(all_workers=True, method='de_register')
 
 # class ScheduleMaster(BaseMaster):
 #     def __init__(self):

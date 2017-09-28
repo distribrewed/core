@@ -48,6 +48,8 @@ class BaseWorker(CeleryWorker):
         tasks.master.call_method_by_name.apply_async(args=[method] + args)
         CALLS_TO_MASTER.inc()
 
+    # Registration methods
+
     def register(self):
         log.info('Sending registration to master')
         self._call_master_method('register_worker', args=[self.name, self._worker_info(), self._worker_methods()])
@@ -55,6 +57,8 @@ class BaseWorker(CeleryWorker):
     def de_register(self):
         log.info('Sending de-registration to master')
         self._call_master_method('de_register_worker', args=[self.name, self._worker_info()])
+
+    # Ping methods
 
     def ping_master(self):
         log.info('Sending ping to master')
