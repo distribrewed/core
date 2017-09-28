@@ -58,29 +58,22 @@ class BaseWorker(CeleryWorker):
 
     def ping_master(self):
         log.info('Sending ping to master')
-        self._call_master_method('handle_ping', args=[self.name])
+        self._call_master_method('_handle_ping', args=[self.name])
 
-    def handle_ping(self):
+    def _handle_ping(self):
         log.info('Received ping from master')
         log.info('Sending pong to master')
-        self._call_master_method('handle_pong', args=[self.name])
+        self._call_master_method('_handle_pong', args=[self.name])
 
-    def handle_pong(self):
+    def _handle_pong(self):
         log.info('Received pong from master')
 
-    def send_method_list(self):
-        log.info('Sending methods to master')
-        self._call_master_method('receive_worker_method_list', args=[self.name, self._worker_methods()])
 
-    def send_method_parameter_list(self, method_name):
-        log.info('Sending parameter list of method \'{0}\' to master'.format(method_name))
-        self._call_master_method('receive_worker_method_parameter_list', args=[
-            self.name,
-            method_name,
-            self._worker_methods()[method_name]
-        ])
+class ScheduleWorker(BaseWorker):
+    def __init__(self):
+        super(ScheduleWorker, self).__init__()
 
-    def start_worker(self, shcedule):
+    def start_worker(self, schedule):
         pass
 
     def stop_worker(self):

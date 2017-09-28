@@ -48,13 +48,17 @@ class BaseMaster(CeleryWorker):
 
     def ping_worker(self, worker_id):
         log.info("Sending ping to '{0}'".format(worker_id))
-        self._call_worker_method(worker_id=worker_id, method='handle_ping')
+        self._call_worker_method(worker_id=worker_id, method='_handle_ping')
 
-    def handle_ping(self, worker_id):
+    def ping_all_workers(self):
+        log.info("Sending ping to all workers")
+        self._call_worker_method(all_workers=True, method='_handle_ping')
+
+    def _handle_ping(self, worker_id):
         log.info("Received ping from '{0}'".format(worker_id))
-        self._call_worker_method(worker_id=worker_id, method='handle_pong')
+        self._call_worker_method(worker_id=worker_id, method='_handle_pong')
 
-    def handle_pong(self, worker_id):
+    def _handle_pong(self, worker_id):
         log.info("Received pong from '{0}'".format(worker_id))
 
     def command_all_workers_to_ping_master(self):
@@ -69,32 +73,22 @@ class BaseMaster(CeleryWorker):
         log.info("Commanding all workers to re-register")
         self._call_worker_method(all_workers=True, method='de_register')
 
-    def request_worker_method_list(self, worker_id):
-        log.info("Requesting method list from worker {0}".format(worker_id))
-        self._call_worker_method(worker_id=worker_id, method='send_method_list')
-
-    def receive_worker_method_list(self, worker_id, method_list):
-        log.info("{0} methods: {1}".format(worker_id, method_list))
-
-    def request_worker_method_parameter_list(self, worker_id, method_name):
-        log.info("Requesting method parameter list of '{0}' from worker {1}".format(method_name, worker_id))
-        self._call_worker_method(worker_id=worker_id, method='send_method_parameter_list', args=[method_name])
-
-    def receive_worker_method_parameter_list(self, worker_id, method_name, parameter_names):
-        log.info("{0} method {1} parameters: {2}".format(worker_id, method_name, parameter_names))
-
-    def request_worker_start(self, worker_id, schedule):
-        log.info("Requesting worker start {0}".format(worker_id))
-        self.call_worker_method(worker_id=worker_id, method='start_worker', args=[schedule])
-
-    def request_worker_stop(self, worker_id):
-        log.info("Requesting worker stop {0}".format(worker_id))
-        self.call_worker_method(worker_id=worker_id, method='stop_worker')
-
-    def request_worker_pause(self, worker_id):
-        log.info("Requesting worker pause {0}".format(worker_id))
-        self.call_worker_method(worker_id=worker_id, method='pause_worker')
-
-    def request_worker_resume(self, worker_id):
-        log.info("Requesting worker pause {0}".format(worker_id))
-        self.call_worker_method(worker_id=worker_id, method='resume_worker')
+# class ScheduleMaster(BaseMaster):
+#     def __init__(self):
+#         super(ScheduleMaster, self).__init__()
+#
+#     def request_worker_start(self, worker_id, schedule):
+#         log.info("Requesting worker start {0}".format(worker_id))
+#         self.call_worker_method(worker_id=worker_id, method='start_worker', args=[schedule])
+#
+#     def request_worker_stop(self, worker_id):
+#         log.info("Requesting worker stop {0}".format(worker_id))
+#         self.call_worker_method(worker_id=worker_id, method='stop_worker')
+#
+#     def request_worker_pause(self, worker_id):
+#         log.info("Requesting worker pause {0}".format(worker_id))
+#         self.call_worker_method(worker_id=worker_id, method='pause_worker')
+#
+#     def request_worker_resume(self, worker_id):
+#         log.info("Requesting worker pause {0}".format(worker_id))
+#         self.call_worker_method(worker_id=worker_id, method='resume_worker')
