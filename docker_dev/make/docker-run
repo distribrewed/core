@@ -5,7 +5,7 @@ docker-dev-run-master: docker-dev-build
 		-v ${ROOT_DIR}:/app \
 		-w /app/core_dev \
 		-e C_FORCE_ROOT=1 \
-		-e MASTER_PLUGIN_CLASS=BaseMaster \
+		-e MASTER_PLUGIN_CLASS=ScheduleMaster \
 		-p 9000:9000 \
 		${DOCKER_DEV_IMAGE_TAG_DEV} \
 		celery -A core_dev worker -l info --concurrency 1
@@ -19,7 +19,7 @@ docker-dev-run-worker1: docker-dev-build
 		-e C_FORCE_ROOT=1 \
 		-e AMQP_HOST=localhost \
 		-e WORKER_NAME=worker1 \
-		-e WORKER_PLUGIN_CLASS=BaseWorker \
+		-e WORKER_PLUGIN_CLASS=ScheduleWorker \
 		-e PROMETHEUS_SCRAPE_PORT=9001 \
 		${DOCKER_DEV_IMAGE_TAG_DEV} \
 		celery -A core_dev worker -l info --concurrency 1
@@ -33,7 +33,7 @@ docker-dev-run-worker2: docker-dev-build
 		-e C_FORCE_ROOT=1 \
 		-e AMQP_HOST=localhost \
 		-e WORKER_NAME=worker2 \
-		-e WORKER_PLUGIN_CLASS=BaseWorker \
+		-e WORKER_PLUGIN_CLASS=ScheduleWorker \
 		-e PROMETHEUS_SCRAPE_PORT=9002 \
 		${DOCKER_DEV_IMAGE_TAG_DEV} \
 		celery -A core_dev worker -l info --concurrency 1

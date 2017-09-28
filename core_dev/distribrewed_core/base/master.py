@@ -10,13 +10,11 @@ from distribrewed_core.base.celery import CeleryWorker
 
 log = logging.getLogger(__name__)
 
-CALLS_TO_WORKERS = Counter('CALLS_TO_WORKERS', 'Number of calls to workers', ['worker'])
-
 
 # noinspection PyMethodMayBeStatic
 class BaseMaster(CeleryWorker):
     def __init__(self):
-        pass
+        self.CALLS_TO_WORKERS = Counter('CALLS_TO_WORKERS', 'Number of calls to workers', ['worker'])
 
     def _on_ready(self):
         super(BaseMaster, self)._on_ready()
@@ -36,9 +34,9 @@ class BaseMaster(CeleryWorker):
             args=[method] + args
         )
         if all_workers:
-            CALLS_TO_WORKERS.labels('all').inc()
+            self.CALLS_TO_WORKERS.labels('all').inc()
         if worker_id:
-            CALLS_TO_WORKERS.labels(worker_id).inc()
+            self.CALLS_TO_WORKERS.labels(worker_id).inc()
 
     # Registration methods
 
@@ -100,22 +98,30 @@ class BaseMaster(CeleryWorker):
     def command_all_workers_to_time_sync(self):
         self._call_worker_method(all_workers=True, method='time_sync')
 
-# class ScheduleMaster(BaseMaster):
-#     def __init__(self):
-#         super(ScheduleMaster, self).__init__()
-#
-#     def request_worker_start(self, worker_id, schedule):
-#         log.info("Requesting worker start {0}".format(worker_id))
-#         self.call_worker_method(worker_id=worker_id, method='start_worker', args=[schedule])
-#
-#     def request_worker_stop(self, worker_id):
-#         log.info("Requesting worker stop {0}".format(worker_id))
-#         self.call_worker_method(worker_id=worker_id, method='stop_worker')
-#
-#     def request_worker_pause(self, worker_id):
-#         log.info("Requesting worker pause {0}".format(worker_id))
-#         self.call_worker_method(worker_id=worker_id, method='pause_worker')
-#
-#     def request_worker_resume(self, worker_id):
-#         log.info("Requesting worker pause {0}".format(worker_id))
-#         self.call_worker_method(worker_id=worker_id, method='resume_worker')
+
+# Schedule master
+class ScheduleMaster(BaseMaster):
+    def __init__(self):
+        super(ScheduleMaster, self).__init__()
+
+    def request_worker_start(self, worker_id, schedule):
+        log.info("Requesting worker start {0}".format(worker_id))
+        self._call_worker_method(worker_id=worker_id, method='start_worker', args=[schedule])
+
+    def request_worker_stop(self, worker_id):
+        log.info("Requesting worker stop {0}".format(worker_id))
+        self._call_worker_method(worker_id=worker_id, method='stop_worker')
+
+    def request_worker_pause(self, worker_id):
+        log.info("Requesting worker pause {0}".format(worker_id))
+        self._call_worker_method(worker_id=worker_id, method='pause_worker')
+
+    def request_worker_resume(self, worker_id):
+        log.info("Requesting worker pause {0}".format(worker_id))
+        self._call_worker_method(worker_id=worker_id, method='resume_worker')
+
+    def request_worker_status(self, worker_id=None, all_workers=None):
+        self._call_worker_method(worker_id=worker_id, all_workers=all_workers, method='send_status_to_master')
+
+    def _handle_status_from_worker(self, worker_id, is_running, is_paused):
+        log.info("Worker {0} status: is_running = {1}, is_paused = {2}".format(worker_id, is_running, is_paused))
