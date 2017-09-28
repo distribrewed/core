@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 
@@ -21,6 +22,14 @@ class BaseMaster(CeleryWorker):
         super(BaseMaster, self)._on_ready()
 
     def _call_worker_method(self, worker_id=None, all_workers=False, method='NONAME', args=[]):
+        assert worker_id or all_workers, 'You must give a worker_id or send to all_workers'
+        assert bool(worker_id) != bool(all_workers), 'You cannot both send to worker_id and all_workers'
+        log.debug('Calling worker method {}({}) worker_id: {}, all_workers: {}'.format(
+            method,
+            ', '.join([str(a) for a in args]),
+            worker_id,
+            all_workers
+        ))
         tasks.worker.call_method_by_name.apply_async(
             worker_id=worker_id,
             all_workers=all_workers,
@@ -36,7 +45,7 @@ class BaseMaster(CeleryWorker):
     def reload_queues(self):
         kombu.pools.reset()  # TODO: Maybe a little drastic / find a better way
 
-    def register_worker(self, worker_id, worker_info, worker_methods, reload_queues=False):
+    def _register_worker(self, worker_id, worker_info, worker_methods, reload_queues=False):
         log.info("Registering '{0}' ; Info : {1} ; Methods : {2}".format(
             worker_id,
             json.dumps(worker_info, sort_keys=True),
@@ -45,7 +54,7 @@ class BaseMaster(CeleryWorker):
         if reload_queues:
             self.reload_queues()
 
-    def de_register_worker(self, worker_id, worker_info):
+    def _de_register_worker(self, worker_id, worker_info):
         log.info("De-registering '{0}': {1}".format(worker_id, json.dumps(worker_info, sort_keys=True)))
 
     def command_all_workers_to_register(self):
@@ -58,13 +67,9 @@ class BaseMaster(CeleryWorker):
 
     # Ping methods
 
-    def ping_worker(self, worker_id):
+    def ping_worker(self, worker_id=None, all_workers=None):
         log.info("Sending ping to '{0}'".format(worker_id))
-        self._call_worker_method(worker_id=worker_id, method='_handle_ping')
-
-    def ping_all_workers(self):
-        log.info("Sending ping to all workers")
-        self._call_worker_method(all_workers=True, method='_handle_ping')
+        self._call_worker_method(worker_id=worker_id, all_workers=all_workers, method='_handle_ping')
 
     def _handle_ping(self, worker_id):
         log.info("Received ping from '{0}'".format(worker_id))
@@ -76,6 +81,24 @@ class BaseMaster(CeleryWorker):
     def command_all_workers_to_ping_master(self):
         log.info("Commanding all workers to ping master")
         self._call_worker_method(all_workers=True, method='ping_master')
+
+    # Time sync
+
+    def send_time_sync_to_worker(self, worker_id=None, all_workers=None):
+        log.info("Sending time sync to {}".format(worker_id if worker_id else 'all workers'))
+        self._call_worker_method(
+            worker_id=worker_id,
+            all_workers=all_workers,
+            method='_handle_time_sync_request',
+            args=[datetime.datetime.now()]
+        )
+
+    def _handle_time_sync_request(self, worker_id):
+        log.info("Received time sync request from {0}".format(worker_id))
+        self.send_time_sync_to_worker(worker_id)
+
+    def command_all_workers_to_time_sync(self):
+        self._call_worker_method(all_workers=True, method='time_sync')
 
 # class ScheduleMaster(BaseMaster):
 #     def __init__(self):

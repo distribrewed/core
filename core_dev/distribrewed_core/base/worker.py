@@ -1,3 +1,4 @@
+import datetime
 import inspect
 import logging
 from collections import OrderedDict
@@ -52,11 +53,11 @@ class BaseWorker(CeleryWorker):
 
     def register(self):
         log.info('Sending registration to master')
-        self._call_master_method('register_worker', args=[self.name, self._worker_info(), self._worker_methods()])
+        self._call_master_method('_register_worker', args=[self.name, self._worker_info(), self._worker_methods()])
 
     def de_register(self):
         log.info('Sending de-registration to master')
-        self._call_master_method('de_register_worker', args=[self.name, self._worker_info()])
+        self._call_master_method('_de_register_worker', args=[self.name, self._worker_info()])
 
     # Ping methods
 
@@ -71,6 +72,20 @@ class BaseWorker(CeleryWorker):
 
     def _handle_pong(self):
         log.info('Received pong from master')
+
+    # Time sync
+
+    def _handle_time_sync_request(self, current_master_time):
+        current_master_time = datetime.datetime.strptime(current_master_time, "%Y-%m-%dT%H:%M:%S.%f")
+        log.info('Received time from master: {0}'.format(current_master_time))
+        diff = datetime.datetime.now() - current_master_time
+        if diff > datetime.timedelta(seconds=5):
+            # TODO: Something more than a warning
+            log.warning('Time diff between master and worker more than 5 seconds: {}'.format(diff))
+
+    def time_sync(self):
+        log.info('Requesting time sync with master')
+        self._call_master_method('_handle_time_sync_request', args=[self.name])
 
 
 class ScheduleWorker(BaseWorker):
