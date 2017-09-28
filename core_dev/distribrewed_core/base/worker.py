@@ -18,7 +18,10 @@ log = logging.getLogger(__name__)
 class BaseWorker(CeleryWorker):
     def __init__(self):
         self.name = settings.WORKER_NAME
-        self.CALLS_TO_MASTER = Counter('CALLS_TO_MASTER', 'Number of calls to master')
+        try:
+            BaseWorker.CALLS_TO_MASTER = Counter('CALLS_TO_MASTER', 'Number of calls to master')
+        except ValueError:
+            pass  # It is already defined
 
     def _worker_info(self):
         return {

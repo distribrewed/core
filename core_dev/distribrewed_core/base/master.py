@@ -14,7 +14,10 @@ log = logging.getLogger(__name__)
 # noinspection PyMethodMayBeStatic
 class BaseMaster(CeleryWorker):
     def __init__(self):
-        self.CALLS_TO_WORKERS = Counter('CALLS_TO_WORKERS', 'Number of calls to workers', ['worker'])
+        try:
+            BaseMaster.CALLS_TO_WORKERS = Counter('CALLS_TO_WORKERS', 'Number of calls to workers', ['worker'])
+        except ValueError:
+            pass  # It is already defined
 
     def _on_ready(self):
         super(BaseMaster, self)._on_ready()

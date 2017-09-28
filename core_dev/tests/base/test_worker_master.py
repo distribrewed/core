@@ -41,8 +41,8 @@ class Tests(TestCase):
         w = get_worker_plugin()
         m.ping_worker(settings.WORKER_NAME)
 
-        worker_task.assert_called_with(all_workers=False, args=['handle_ping'], worker_id=default_settings.WORKER_NAME)
-        master_task.assert_called_with(args=['handle_pong', default_settings.WORKER_NAME])
+        worker_task.assert_called_with(all_workers=None, args=['_handle_ping'], worker_id=default_settings.WORKER_NAME)
+        master_task.assert_called_with(args=['_handle_pong', default_settings.WORKER_NAME])
 
     @patch(
         'distribrewed_core.tasks.worker.call_method_by_name.apply_async',
@@ -66,5 +66,5 @@ class Tests(TestCase):
         m = get_master_plugin()
         w = get_worker_plugin()
         m.command_all_workers_to_ping_master()
-        master_task.assert_called_with(args=['handle_ping', default_settings.WORKER_NAME])
-        worker_task.assert_called_with(all_workers=False, args=['handle_pong'], worker_id=default_settings.WORKER_NAME)
+        master_task.assert_called_with(args=['_handle_ping', default_settings.WORKER_NAME])
+        worker_task.assert_called_with(all_workers=False, args=['_handle_pong'], worker_id=default_settings.WORKER_NAME)
