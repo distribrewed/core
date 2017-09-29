@@ -85,6 +85,7 @@ class Tests(TestCase):
             'ip': None,
             'info': {
                 'is_running': False,
-                'is_paused': False
+                'is_paused': False,
+                'schedule_id': None
             }
         })
