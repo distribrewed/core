@@ -68,3 +68,23 @@ class Tests(TestCase):
         m.command_all_workers_to_ping_master()
         master_task.assert_called_with(args=['_handle_ping', default_settings.WORKER_NAME])
         worker_task.assert_called_with(all_workers=False, args=['_handle_pong'], worker_id=default_settings.WORKER_NAME)
+
+    @patch('distribrewed_core.plugin.settings')
+    def test_get_info(self, settings):
+        settings.WORKER_PLUGIN_CLASS = 'ScheduleWorker'
+        settings.WORKER_NAME = default_settings.WORKER_NAME
+        settings.PLUGIN_DIR = default_settings.PLUGIN_DIR
+        clear_plugins()
+        w = get_worker_plugin()
+        info = w._worker_info()
+        del info['id']
+        self.assertEqual(info, {
+            'prometheus_scrape_port': None,
+            'type': 'ScheduleWorker',
+            'inheritance_chain': ['ScheduleWorker', 'BaseWorker'],
+            'ip': None,
+            'info': {
+                'is_running': False,
+                'is_paused': False
+            }
+        })

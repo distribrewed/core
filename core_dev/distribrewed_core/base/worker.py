@@ -28,8 +28,18 @@ class BaseWorker(CeleryWorker):
             'id': self.name,
             'ip': self.ip,
             'type': self.__class__.__name__,
-            'prometheus_scrape_port': self.prom_port
+            'inheritance_chain': [
+                c.__name__ for c in inspect.getmro(self.__class__) if c.__name__ not in ['CeleryWorker', 'object']
+            ],
+            'prometheus_scrape_port': self.prom_port,
+            'info': self._info()
         }
+
+    def _info(self):
+        """
+        Override for info
+        """
+        return {}
 
     def _worker_methods(self):
         methods = [e for e in dir(self) if callable(getattr(self, e)) and not e.startswith('_')]
@@ -93,6 +103,19 @@ class BaseWorker(CeleryWorker):
         self._call_master_method('_handle_time_sync_request', args=[self.name])
 
 
+# Message workers
+class MessageWorker(BaseWorker):
+    def __init__(self):
+        super(MessageWorker, self).__init__()
+        try:
+            MessageWorker.MESSAGES_SENT = Counter('MESSAGES_SENT', 'Number of messages sent')
+        except ValueError:
+            pass  # It is already defined
+
+    def send_message(self, message):
+        self.MESSAGES_SENT.inc()
+
+
 # Schedule workers
 
 scheduler_running = False
@@ -120,6 +143,14 @@ class ScheduleWorker(BaseWorker):
         """
         pass
 
+    def _info(self):
+        global scheduler_running
+        global scheduler_paused
+        return {
+            'is_running': scheduler_running,
+            'is_paused': scheduler_paused
+        }
+
     def start_worker(self, worker_schedule):
         schedule.clear()
         self._setup_worker_schedule(worker_schedule)
@@ -129,6 +160,7 @@ class ScheduleWorker(BaseWorker):
             self.schedule_thread = Thread(target=run_scheduler)
             self.schedule_thread.start()
         self.resume_worker()
+        self.register()
 
     def stop_worker(self):
         global scheduler_running
@@ -136,22 +168,16 @@ class ScheduleWorker(BaseWorker):
             scheduler_running = False
             self.schedule_thread.join(timeout=10)
             self.schedule_thread = None
+        self.register()
 
     # noinspection PyMethodMayBeStatic
     def pause_worker(self):
         global scheduler_paused
         scheduler_paused = True
+        self.register()
 
     # noinspection PyMethodMayBeStatic
     def resume_worker(self):
         global scheduler_paused
         scheduler_paused = False
-
-    def send_status_to_master(self):
-        global scheduler_running
-        global scheduler_paused
-        self._call_master_method(method='_handle_status_from_worker', args=[
-            self.name,
-            scheduler_running,
-            scheduler_paused
-        ])
+        self.register()

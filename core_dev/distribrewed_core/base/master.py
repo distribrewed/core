@@ -122,9 +122,3 @@ class ScheduleMaster(BaseMaster):
     def request_worker_resume(self, worker_id):
         log.info("Requesting worker pause {0}".format(worker_id))
         self._call_worker_method(worker_id=worker_id, method='resume_worker')
-
-    def request_worker_status(self, worker_id=None, all_workers=None):
-        self._call_worker_method(worker_id=worker_id, all_workers=all_workers, method='send_status_to_master')
-
-    def _handle_status_from_worker(self, worker_id, is_running, is_paused):
-        log.info("Worker {0} status: is_running = {1}, is_paused = {2}".format(worker_id, is_running, is_paused))
