@@ -136,6 +136,7 @@ class ScheduleWorker(BaseWorker):
 
     def __init__(self):
         super(ScheduleWorker, self).__init__()
+        self.schedule_id = None
 
     def _setup_worker_schedule(self, worker_schedule):
         """
@@ -147,11 +148,13 @@ class ScheduleWorker(BaseWorker):
         global scheduler_running
         global scheduler_paused
         return {
+            'schedule_id': self.schedule_id,
             'is_running': scheduler_running,
-            'is_paused': scheduler_paused
+            'is_paused': scheduler_paused,
         }
 
-    def start_worker(self, worker_schedule):
+    def start_worker(self, schedule_id, worker_schedule):
+        self.schedule_id = schedule_id
         schedule.clear()
         self._setup_worker_schedule(worker_schedule)
         global scheduler_running
@@ -168,6 +171,7 @@ class ScheduleWorker(BaseWorker):
             scheduler_running = False
             self.schedule_thread.join(timeout=10)
             self.schedule_thread = None
+        self.schedule_id = None
         self.register()
 
     # noinspection PyMethodMayBeStatic
@@ -181,3 +185,6 @@ class ScheduleWorker(BaseWorker):
         global scheduler_paused
         scheduler_paused = False
         self.register()
+
+    def _send_master_is_finished(self):
+        self._call_master_method('_handle_worker_finished', args=[self.name, self.schedule_id])

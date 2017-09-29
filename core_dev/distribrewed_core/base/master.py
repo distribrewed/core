@@ -122,3 +122,6 @@ class ScheduleMaster(BaseMaster):
     def request_worker_resume(self, worker_id):
         log.info("Requesting worker pause {0}".format(worker_id))
         self._call_worker_method(worker_id=worker_id, method='resume_worker')
+
+    def _handle_worker_finished(self, worker_id, schedule_id):
+        log.info("Worker {0} finished schedule {0}".format(worker_id, schedule_id))
