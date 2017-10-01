@@ -163,13 +163,11 @@ class ScheduleWorker(BaseWorker):
             self.schedule_thread = Thread(target=run_scheduler)
             self.schedule_thread.start()
         self.resume_worker()
-        self.register()
 
     def stop_worker(self):
         global scheduler_running
         if scheduler_running:
             scheduler_running = False
-            self.schedule_thread.join(timeout=10)
             self.schedule_thread = None
         self.schedule_id = None
         self.register()
