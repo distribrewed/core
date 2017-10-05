@@ -28,7 +28,8 @@ WORKER_PLUGIN_CLASS = environ.get('WORKER_PLUGIN_CLASS', None)
 
 WORKER_NAME = environ.get('WORKER_NAME', environ.get('HOSTNAME', None))  # TODO: Add random hash too default value
 
+DEBUG = environ.get('DEBUG', 'false').lower() in ['1', 'true']
+
 if WORKER_NAME.lower() == 'all':
     print("Worker name cannot be 'all'", flush=True)
     exit(-1)
-

@@ -86,7 +86,7 @@ from distribrewed_core.tasks.worker import *
 @signals.setup_logging.connect
 def setup_logging(*args, **kwargs):
     # If debug
-    if 1 == 0:
+    if settings.DEBUG:
         logging.basicConfig(level=logging.DEBUG, format='%(pathname)s:%(lineno)s: [%(levelname)s] %(message)s')
     else:
         # Standard logging
