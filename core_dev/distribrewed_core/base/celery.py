@@ -9,6 +9,8 @@ log = logging.getLogger(__name__)
 
 
 def get_ip():
+    if settings.PROMETHEUS_SCRAPE_IP:
+        return settings.PROMETHEUS_SCRAPE_IP
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect((settings.AMQP_HOST, settings.AMQP_PORT))
     ip = s.getsockname()[0]

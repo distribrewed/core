@@ -15,6 +15,7 @@ AMQP_VHOST = environ.get('AMQP_VHOST', 'celery.distribrewed')
 CELERY_ALWAYS_EAGER = environ.get('CELERY_ALWAYS_EAGER', 'false').lower() in ['1', 'true']
 
 # Prometheus
+PROMETHEUS_SCRAPE_IP = environ.get('PROMETHEUS_SCRAPE_IP')
 PROMETHEUS_SCRAPE_PORT = int(environ.get('PROMETHEUS_SCRAPE_PORT', random.randint(30000, 40000)))
 
 # Plugins
