@@ -5,13 +5,13 @@ from distribrewed_core.base.celery import CeleryWorker
 
 
 class Tests(TestCase):
-
     @patch('distribrewed_core.tasks.master.shared_task')
     @patch('distribrewed_core.base.celery.start_http_server')
     @patch('distribrewed_core.base.celery.settings')
     def test_on_ready(self, settings, mock_prom_server, shared_task):
         settings.AMQP_HOST = '127.0.0.1'
         settings.AMQP_PORT = 0
+        settings.PROMETHEUS_SCRAPE_IP = None
         settings.PROMETHEUS_SCRAPE_PORT = 9123
 
         worker = CeleryWorker()
