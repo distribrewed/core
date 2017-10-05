@@ -79,7 +79,7 @@ class Tests(TestCase):
         info = w._worker_info()
         del info['id']
         self.assertEqual(info, {
-            'events': ['on_start', 'on_stop', 'on_pause', 'on_resumeon_finished'],
+            'events': ['on_start', 'on_stop', 'on_pause', 'on_resume', 'on_finished'],
             'prometheus_scrape_port': None,
             'type': 'ScheduleWorker',
             'inheritance_chain': ['ScheduleWorker', 'BaseWorker'],
