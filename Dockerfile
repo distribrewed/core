@@ -1,6 +1,7 @@
 FROM distribrewed/base:x64
 
-ENV TMP_DIR=/tmp
+ENV TMP_DIR=/tmp \
+    C_FORCE_ROOT=1
 
 COPY . ${TMP_DIR}/core
 RUN pip install ${TMP_DIR}/core/ && rm -rf ${TMP_DIR}/*

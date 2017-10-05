@@ -101,6 +101,13 @@ class BaseMaster(CeleryWorker):
     def command_all_workers_to_time_sync(self):
         self._call_worker_method(all_workers=True, method='time_sync')
 
+    # Grafana
+    def command_worker_to_send_grafana_rows(self, worker_id):
+        self._call_worker_method(worker_id=worker_id, method='_handle_grafana_rows_request')
+
+    def _receive_grafana_rows(self, worker_id, rows):
+        log.info('Received grafana rows from worker {}: {}'.format(worker_id, rows))
+
 
 # Schedule master
 class ScheduleMaster(BaseMaster):

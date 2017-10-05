@@ -102,6 +102,18 @@ class BaseWorker(CeleryWorker):
         log.info('Requesting time sync with master')
         self._call_master_method('_handle_time_sync_request', args=[self.name])
 
+    # Grafana
+
+    def _handle_grafana_rows_request(self):
+        self._call_master_method('_receive_grafana_rows', args=[self.name, self._get_grafana_rows()])
+
+    def _get_grafana_rows(self):
+        """
+        Override to return a list of grafana rows to master
+        :return: List of grafana rows
+        """
+        return []
+
 
 # Message workers
 class MessageWorker(BaseWorker):

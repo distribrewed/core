@@ -23,6 +23,8 @@ queue.conf.broker_url = 'amqp://{username}:{password}@{host}:{port}/{vhost}'.for
 queue.conf.timezone = 'Atlantic/Reykjavik'
 
 queue.conf.worker_hijack_root_logger = False
+queue.conf.task_serializer = 'pickle'
+queue.conf.accept_content = ['pickle']
 
 # if os.environ.get('CELERY_LOGGING', 'true').lower() not in ['1', 'true']:
 #     logging.getLogger('celery').propagate = False
