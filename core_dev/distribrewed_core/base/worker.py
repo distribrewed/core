@@ -169,7 +169,7 @@ class ScheduleWorker(BaseWorker):
         pass
 
     def _events(self):
-        return ['on_start', 'on_stop', 'on_pause', 'on_resume' 'on_finished']
+        return ['on_start', 'on_stop', 'on_pause', 'on_resume', 'on_finished']
 
     def _info(self):
         global scheduler_running
