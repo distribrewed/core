@@ -83,6 +83,10 @@ class BaseMaster(CeleryWorker):
         log.info("Commanding all workers to ping master")
         self._call_worker_method(all_workers=True, method='ping_master')
 
+    # Events
+    def _receive_event(self, worker_id, event_name):
+        log.info("Recevied event '{}' from worker {}".format(event_name, worker_id))
+
     # Time sync
 
     def send_time_sync_to_worker(self, worker_id=None, all_workers=None):

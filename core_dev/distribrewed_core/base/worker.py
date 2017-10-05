@@ -32,8 +32,16 @@ class BaseWorker(CeleryWorker):
                 c.__name__ for c in inspect.getmro(self.__class__) if c.__name__ not in ['CeleryWorker', 'object']
             ],
             'prometheus_scrape_port': self.prom_port,
+            'events': self._events(),
             'info': self._info()
         }
+
+    def _events(self):
+        """
+        Override to return event list
+        :return: []
+        """
+        return []
 
     def _info(self):
         """
@@ -87,6 +95,10 @@ class BaseWorker(CeleryWorker):
 
     def _handle_pong(self):
         log.info('Received pong from master')
+
+    def _send_event_to_master(self, event_name):
+        assert event_name in self._events(), "Event '{}' not defined in class events".format(event_name)
+        self._call_master_method('_receive_event', args=[self.name, event_name])
 
     # Time sync
 
@@ -156,6 +168,9 @@ class ScheduleWorker(BaseWorker):
         """
         pass
 
+    def _events(self):
+        return ['on_start', 'on_stop', 'on_pause', 'on_resume' 'on_finished']
+
     def _info(self):
         global scheduler_running
         global scheduler_paused
@@ -175,6 +190,7 @@ class ScheduleWorker(BaseWorker):
             self.schedule_thread = Thread(target=run_scheduler)
             self.schedule_thread.start()
         self.resume_worker()
+        self._send_event_to_master('on_start')
 
     def stop_worker(self):
         global scheduler_running
@@ -183,18 +199,22 @@ class ScheduleWorker(BaseWorker):
             self.schedule_thread = None
         self.schedule_id = None
         self.register()
+        self._send_event_to_master('on_stop')
 
     # noinspection PyMethodMayBeStatic
     def pause_worker(self):
         global scheduler_paused
         scheduler_paused = True
         self.register()
+        self._send_event_to_master('on_pause')
 
     # noinspection PyMethodMayBeStatic
     def resume_worker(self):
         global scheduler_paused
         scheduler_paused = False
         self.register()
+        self._send_event_to_master('on_resume')
 
     def _send_master_is_finished(self):
         self._call_master_method('_handle_worker_finished', args=[self.name, self.schedule_id])
+        self._send_event_to_master('on_finished')
