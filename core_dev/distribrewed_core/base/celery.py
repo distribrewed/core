@@ -9,8 +9,8 @@ log = logging.getLogger(__name__)
 
 
 def get_ip():
-    #if settings.PROMETHEUS_SCRAPE_IP:
-    #    return settings.PROMETHEUS_SCRAPE_IP
+    if settings.PROMETHEUS_SCRAPE_IP:
+        return settings.PROMETHEUS_SCRAPE_IP
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect((settings.AMQP_HOST, settings.AMQP_PORT))
     ip = s.getsockname()[0]
@@ -30,8 +30,8 @@ class CeleryWorker:
             start_http_server(self.prom_port)
         except Exception as e:
             log.error('Failed starting prometheus scrape port: {0}'.format(e))
-
-        self.ip = get_ip()
+        if not self.ip:
+            self.ip = get_ip()
         if self.ip.startswith('172'):
             log.warning('Container not running in HOST mode, not a public IP address')
 
