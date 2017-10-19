@@ -5,7 +5,7 @@ from os import environ, path
 TESTING = environ.get('TESTING', 'false').lower() in ['1', 'true']
 
 # RabbitMQ
-AMQP_HOST = environ.get('AMQP_HOST', 'rabbitmq')
+AMQP_HOST = environ.get('AMQP_HOST', 'localhost')
 AMQP_PORT = int(environ.get('AMQP_PORT', '5672'))
 AMQP_USER = environ.get('AMQP_USER', 'distribrewed')
 AMQP_PASS = environ.get('AMQP_PASS', 'secretpass')
