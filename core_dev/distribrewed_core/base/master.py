@@ -134,5 +134,9 @@ class ScheduleMaster(BaseMaster):
         log.info("Requesting worker pause {0}".format(worker_id))
         self._call_worker_method(worker_id=worker_id, method='resume_worker')
 
+    def request_worker_state(self, worker_id):
+        log.info("Requesting worker state {0}".format(worker_id))
+        self._call_worker_method(worker_id=worker_id, method='worker_state')
+
     def _handle_worker_finished(self, worker_id, schedule_id):
         log.info("Worker {0} finished schedule {0}".format(worker_id, schedule_id))

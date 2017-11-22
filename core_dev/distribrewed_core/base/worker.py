@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 class BaseWorker(CeleryWorker):
     def __init__(self):
         self.name = settings.WORKER_NAME
+        self.state = 'idle'
         try:
             BaseWorker.CALLS_TO_MASTER = Counter('CALLS_TO_MASTER', 'Number of calls to master')
         except ValueError:
@@ -33,7 +34,8 @@ class BaseWorker(CeleryWorker):
             ],
             'prometheus_scrape_port': self.prom_port,
             'events': self._events(),
-            'info': self._info()
+            'info': self._info(),
+            'state': self.state
         }
 
     def _events(self):
@@ -190,6 +192,7 @@ class ScheduleWorker(BaseWorker):
             self.schedule_thread = Thread(target=run_scheduler)
             self.schedule_thread.start()
         self.resume_worker()
+        self.state = 'working'
         self._send_event_to_master('on_start')
 
     def stop_worker(self):
@@ -199,6 +202,7 @@ class ScheduleWorker(BaseWorker):
             self.schedule_thread = None
         self.schedule_id = None
         self.register()
+        self.state = 'done'
         self._send_event_to_master('on_stop')
 
     # noinspection PyMethodMayBeStatic
@@ -206,6 +210,7 @@ class ScheduleWorker(BaseWorker):
         global scheduler_paused
         scheduler_paused = True
         self.register()
+        self.state = 'paused'
         self._send_event_to_master('on_pause')
 
     # noinspection PyMethodMayBeStatic
@@ -213,8 +218,10 @@ class ScheduleWorker(BaseWorker):
         global scheduler_paused
         scheduler_paused = False
         self.register()
+        self.state = 'working'
         self._send_event_to_master('on_resume')
 
     def _send_master_is_finished(self):
+        self.state = 'done'
         self._call_master_method('_handle_worker_finished', args=[self.name, self.schedule_id])
         self._send_event_to_master('on_finished')
