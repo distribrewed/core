@@ -18,7 +18,6 @@ log = logging.getLogger(__name__)
 class BaseWorker(CeleryWorker):
     def __init__(self):
         self.name = settings.WORKER_NAME
-        self.state = 'idle'
         try:
             BaseWorker.CALLS_TO_MASTER = Counter('CALLS_TO_MASTER', 'Number of calls to master')
         except ValueError:
@@ -34,8 +33,7 @@ class BaseWorker(CeleryWorker):
             ],
             'prometheus_scrape_port': self.prom_port,
             'events': self._events(),
-            'info': self._info(),
-            'state': self.state
+            'info': self._info()
         }
 
     def _events(self):
@@ -146,11 +144,13 @@ class MessageWorker(BaseWorker):
 
 scheduler_running = False
 scheduler_paused = False
+scheduler_done = False
 
 
 def run_scheduler():
     global scheduler_running
     global scheduler_paused
+    global scheduler_done
     while scheduler_running:
         if not scheduler_paused:
             schedule.run_pending()
@@ -176,10 +176,12 @@ class ScheduleWorker(BaseWorker):
     def _info(self):
         global scheduler_running
         global scheduler_paused
+        global scheduler_done
         return {
             'schedule_id': self.schedule_id,
             'is_running': scheduler_running,
             'is_paused': scheduler_paused,
+            'is_done': scheduler_done,
         }
 
     def start_worker(self, schedule_id, worker_schedule):
@@ -187,22 +189,24 @@ class ScheduleWorker(BaseWorker):
         schedule.clear()
         self._setup_worker_schedule(worker_schedule)
         global scheduler_running
+        global scheduler_done
+        scheduler_done = False
         if not scheduler_running:
             scheduler_running = True
             self.schedule_thread = Thread(target=run_scheduler)
             self.schedule_thread.start()
         self.resume_worker()
-        self.state = 'working'
         self._send_event_to_master('on_start')
 
     def stop_worker(self):
         global scheduler_running
+        global scheduler_done
+        scheduler_done = True
         if scheduler_running:
             scheduler_running = False
             self.schedule_thread = None
         self.schedule_id = None
         self.register()
-        self.state = 'done'
         self._send_event_to_master('on_stop')
 
     # noinspection PyMethodMayBeStatic
@@ -210,7 +214,6 @@ class ScheduleWorker(BaseWorker):
         global scheduler_paused
         scheduler_paused = True
         self.register()
-        self.state = 'paused'
         self._send_event_to_master('on_pause')
 
     # noinspection PyMethodMayBeStatic
@@ -218,10 +221,10 @@ class ScheduleWorker(BaseWorker):
         global scheduler_paused
         scheduler_paused = False
         self.register()
-        self.state = 'working'
         self._send_event_to_master('on_resume')
 
     def _send_master_is_finished(self):
-        self.state = 'done'
+        global scheduler_done
+        scheduler_done = True
         self._call_master_method('_handle_worker_finished', args=[self.name, self.schedule_id])
         self._send_event_to_master('on_finished')
