@@ -9,7 +9,7 @@ fi
 
 # Drop root privileges if we are running celery
 # allow the container to be started with `--user`
-if [ "$1" = 'celery' -a "$(id -u)" = '0' ]; then
+if [ "$1" = 'celery' -a "$(id -u)" = '0' ] && [ ${ARCH} != 'arm']; then
 	set -- su-exec distribrewed "$@"
 fi
 
